@@ -1,0 +1,10 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { removeItem, updateQuantity } from '../CartSlice.jsx';
+import Header from './Header.jsx';
+export default function CartItem({ navigate }) {
+  const dispatch = useDispatch();
+  const items = useSelector(state => state.cart.items);
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  return <><Header navigate={navigate} page="cart"/><main className="cart-page"><span className="eyebrow">Your selection</span><h1>Shopping Cart</h1><div className="cart-layout"><section className="cart-items" aria-label="Cart items"><div className="section-title"><h2>{count} {count === 1 ? 'plant' : 'plants'} in your cart</h2></div>{items.length === 0 ? <div className="empty"><p>Your cart is waiting for something green.</p><button onClick={() => navigate('plants')}>Browse plants</button></div> : items.map(item => <article className="cart-row" key={item.id}><img src={item.image} alt={item.name}/><div className="cart-info"><h3>{item.name}</h3><p>Unit price: ${item.price.toFixed(2)}</p><button className="delete" onClick={() => dispatch(removeItem(item.id))}>Delete</button></div><div className="cart-controls"><div className="stepper"><button aria-label={`Decrease ${item.name}`} onClick={() => dispatch(updateQuantity({ id: item.id, change: -1 }))}>−</button><span>{item.quantity}</span><button aria-label={`Increase ${item.name}`} onClick={() => dispatch(updateQuantity({ id: item.id, change: 1 }))}>+</button></div><strong>${(item.price * item.quantity).toFixed(2)}</strong></div></article>)}</section><aside className="summary"><h2>Order summary</h2><div><span>Total plants</span><strong>{count}</strong></div><div className="grand-total"><span>Total cost</span><strong>${total.toFixed(2)}</strong></div><button className="checkout" onClick={() => window.alert('Coming Soon')}>Checkout</button><button className="continue" onClick={() => navigate('plants')}>Continue Shopping</button></aside></div></main></>;
+}
